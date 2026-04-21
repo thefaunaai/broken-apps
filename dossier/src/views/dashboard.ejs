@@ -1,0 +1,16 @@
+<%- include("_header", { user, title: user.org_name + " \u00b7 Projects" }) %>
+<section>
+    <h1><%= user.org_name %></h1>
+    <p class="muted">Projects shared with your organization.</p>
+    <ul class="project-list">
+        <% projects.forEach(function(p) { %>
+            <li>
+                <a class="project" href="/projects/<%= p.id %>">
+                    <strong><%= p.name %></strong>
+                    <span class="muted"><%= p.description %></span>
+                </a>
+            </li>
+        <% }) %>
+    </ul>
+</section>
+<%- include("_footer") %>

@@ -1,0 +1,83 @@
+<%
+function escapeHtml(s) {
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+// Parse a single newline-delimited block into HTML.
+function renderBlock(block) {
+    const lines = block.split("\n");
+
+    // Markdown-style table: header row + separator row of dashes/pipes.
+    if (lines.length >= 2
+        && lines[0].trim().startsWith("|")
+        && /^\s*\|[\s\-:|]+\|\s*$/.test(lines[1])) {
+        const cells = (line) => line.split("|").slice(1, -1).map((c) => c.trim());
+        const headers = cells(lines[0]);
+        const rows = lines.slice(2)
+            .filter((l) => l.trim().startsWith("|"))
+            .map(cells);
+        return renderTable(headers, rows);
+    }
+
+    // CSV: first line all-caps comma-separated headers.
+    if (lines.length >= 2 && /^[A-Z][A-Z_ ]*(,[A-Z][A-Z_ ]*)+$/.test(lines[0].trim())) {
+        const headers = lines[0].split(",").map((c) => c.trim());
+        const dataLines = lines.slice(1);
+        const rows = dataLines
+            .filter((l) => l.includes(",") && !/^[\u2014\-]\s/.test(l.trim()))
+            .map((l) => l.split(",").map((c) => c.trim()));
+        const noteLine = dataLines.find((l) => /^[\u2014\-]\s/.test(l.trim()));
+        return renderTable(headers, rows, noteLine);
+    }
+
+    // Definition list: every line matches "Key: value".
+    if (lines.length >= 2 && lines.every((l) => /^[A-Z][^:]{0,40}:\s+.+/.test(l))) {
+        const items = lines.map((l) => {
+            const idx = l.indexOf(":");
+            return [l.slice(0, idx).trim(), l.slice(idx + 1).trim()];
+        });
+        return "<dl class=\"spec\">"
+            + items.map(([k, v]) =>
+                `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`
+            ).join("")
+            + "</dl>";
+    }
+
+    // Default: paragraph with soft line breaks.
+    return "<p>" + lines.map(escapeHtml).join("<br>") + "</p>";
+}
+
+function renderTable(headers, rows, noteLine) {
+    const thead = "<thead><tr>"
+        + headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")
+        + "</tr></thead>";
+    const tbody = "<tbody>"
+        + rows.map((r) =>
+            "<tr>" + r.map((c) => `<td>${escapeHtml(c)}</td>`).join("") + "</tr>"
+        ).join("")
+        + "</tbody>";
+    let html = `<table class="doc-table">${thead}${tbody}</table>`;
+    if (noteLine) {
+        html += `<p class="doc-note">${escapeHtml(noteLine.trim())}</p>`;
+    }
+    return html;
+}
+
+function renderBody(body) {
+    return body.split(/\n{2,}/).map(renderBlock).join("\n");
+}
+%>
+<%- include("_header", { user, title: report.title }) %>
+<section>
+    <p class="crumb"><a href="/dashboard"><%= user.org_name %></a> / <a href="/projects/<%= report.project_id %>"><%= report.project_name %></a> / <%= report.title %></p>
+    <h1><%= report.title %></h1>
+    <% if (report.sensitivity === "confidential") { %>
+        <p class="badge badge-confidential">confidential</p>
+    <% } %>
+    <article class="doc"><%- renderBody(report.body) %></article>
+</section>
+<%- include("_footer") %>

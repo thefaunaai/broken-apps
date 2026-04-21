@@ -1,0 +1,21 @@
+<%- include("_header", { user, title: project.name }) %>
+<section>
+    <p class="crumb"><a href="/dashboard"><%= user.org_name %></a> / <%= project.name %></p>
+    <h1><%= project.name %></h1>
+    <p class="muted"><%= project.description %></p>
+
+    <h2>Reports</h2>
+    <ul class="report-list">
+        <% reports.forEach(function(r) { %>
+            <li>
+                <a href="/reports/<%= r.id %>">
+                    <strong><%= r.title %></strong>
+                    <% if (r.sensitivity === "confidential") { %>
+                        <span class="badge badge-confidential">confidential</span>
+                    <% } %>
+                </a>
+            </li>
+        <% }) %>
+    </ul>
+</section>
+<%- include("_footer") %>

@@ -1,0 +1,21 @@
+{
+  "name": "dossier",
+  "version": "1.0.0",
+  "description": "Dossier: project workspace for teams. (Deliberately vulnerable proof-case target for Hound.)",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/seed.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1"
+  }
+}

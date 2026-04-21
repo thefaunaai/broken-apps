@@ -1,0 +1,12 @@
+node_modules/
+*.log
+*.sqlite
+*.sqlite-journal
+*.db
+.DS_Store
+.env
+.env.*
+*.bak
+*.bak-*
+.idea/
+.vscode/

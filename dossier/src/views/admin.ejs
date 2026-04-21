@@ -1,0 +1,36 @@
+<%- include("_header", { user, title: "Admin \u00b7 " + user.org_name }) %>
+<section>
+    <h1>Admin</h1>
+    <p class="muted">Manage members of <%= user.org_name %>.</p>
+    <% if (flash === "reset_ok") { %>
+        <div class="success">Password reset.</div>
+    <% } else if (flash === "too_short") { %>
+        <div class="error">Password must be at least 4 characters.</div>
+    <% } else if (flash === "not_found") { %>
+        <div class="error">User not found.</div>
+    <% } else if (flash === "peer_admin") { %>
+        <div class="error">You can't reset another admin's password. Ask them to use "Forgot password" instead.</div>
+    <% } %>
+    <table class="members">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Reset password</th></tr>
+        </thead>
+        <tbody>
+            <% members.forEach(function(m) { %>
+                <tr>
+                    <td><%= m.id %></td>
+                    <td><%= m.name %></td>
+                    <td><%= m.email %></td>
+                    <td><span class="role role-<%= m.role %>"><%= m.role %></span></td>
+                    <td>
+                        <form method="post" action="/admin/users/<%= m.id %>/password" class="inline">
+                            <input type="password" name="password" placeholder="new password" required minlength="4" />
+                            <button type="submit">Reset</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</section>
+<%- include("_footer") %>

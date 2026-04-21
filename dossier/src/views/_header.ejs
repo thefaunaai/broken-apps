@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title><%= typeof title !== "undefined" ? title : "Dossier" %></title>
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/dashboard">Dossier</a>
+    <% if (user) { %>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <% if (user.role === "admin") { %>
+                <a href="/admin">Admin</a>
+            <% } %>
+            <a href="/settings">Settings</a>
+        </nav>
+        <div class="who">
+            <span class="name"><%= user.name %></span>
+            <span class="org"><%= user.org_name %></span>
+            <span class="role role-<%= user.role %>"><%= user.role %></span>
+            <form method="post" action="/logout" class="inline">
+                <button class="linkish" type="submit">Sign out</button>
+            </form>
+        </div>
+    <% } %>
+</header>
+<main>

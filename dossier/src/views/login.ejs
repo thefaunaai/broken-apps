@@ -1,0 +1,15 @@
+<% const user = null; %>
+<%- include("_header", { user, title: "Sign in to Dossier" }) %>
+<section class="card auth">
+    <h1>Sign in to Dossier</h1>
+    <p class="muted">Project workspace for teams.</p>
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+    <form method="post" action="/login">
+        <label>Email<input type="email" name="email" autocomplete="username" required autofocus /></label>
+        <label>Password<input type="password" name="password" autocomplete="current-password" required /></label>
+        <button type="submit">Sign in</button>
+    </form>
+</section>
+<%- include("_footer") %>
