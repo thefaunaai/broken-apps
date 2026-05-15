@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: dossier
     ports:
-      - "3000:3000"
+      - "${HOST_PORT:-0}:3000"
     environment:
       - SESSION_SECRET=dossier-dev-secret-not-for-production
       - PORT=3000

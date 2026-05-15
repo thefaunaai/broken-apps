@@ -28,8 +28,9 @@ make reset     # wipe state, reseed, restart
 make down      # stop and remove
 ```
 
-The app listens on `http://localhost:3000`. Seed credentials are
-printed by `make up`.
+Docker assigns an available host port and `make up` prints the URL and
+seed credentials. Use `HOST_PORT=3101 make up` only when you need a
+fixed host port.
 
 ## Seed Accounts
 
