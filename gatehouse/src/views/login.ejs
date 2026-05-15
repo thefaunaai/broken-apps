@@ -1,0 +1,13 @@
+<%- include("_header", { title: "Sign in to Gatehouse" }) %>
+<section class="card auth">
+    <h1>Sign in to Gatehouse</h1>
+    <p class="muted">Enter an email address to receive a verification code.</p>
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+    <form method="post" action="/login">
+        <label>Email<input type="email" name="email" autocomplete="email" required autofocus /></label>
+        <button type="submit">Send code</button>
+    </form>
+</section>
+<%- include("_footer") %>

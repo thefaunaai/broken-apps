@@ -1,0 +1,9 @@
+node_modules
+.env
+.env.*
+infra/.terraform
+infra/.run
+infra/*.tfvars
+infra/*.tfvars.json
+*.log
+.DS_Store
