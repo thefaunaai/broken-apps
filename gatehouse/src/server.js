@@ -8,9 +8,9 @@ const path = require("path");
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
-const MAIL_MODE = process.env.MAIL_MODE || "stdout";
-const SMTP_URL = process.env.SMTP_URL || "";
-const MAIL_FROM = process.env.MAIL_FROM || "Gatehouse <no-reply@gatehouse.local>";
+const SMTP_URL = String(process.env.SMTP_URL || "").trim();
+const SMTP_ENABLED = Boolean(SMTP_URL);
+const MAIL_FROM = String(process.env.MAIL_FROM || "").trim();
 const ALLOWED_EMAIL = String(process.env.ALLOWED_EMAIL || "").trim().toLowerCase();
 const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("base64url");
 const CODE_TTL_MS = 10 * 60 * 1000;
@@ -43,20 +43,17 @@ app.use(
 );
 
 // --- startup: validate mail configuration ---
-if (!["stdout", "smtp"].includes(MAIL_MODE)) {
-    throw new Error("MAIL_MODE must be stdout or smtp");
+if (SMTP_ENABLED && !MAIL_FROM) {
+    throw new Error("MAIL_FROM is required when SMTP_URL is set");
 }
-if (MAIL_MODE === "smtp" && !SMTP_URL) {
-    throw new Error("SMTP_URL is required when MAIL_MODE is smtp");
-}
-if (MAIL_MODE === "smtp" && !ALLOWED_EMAIL) {
-    throw new Error("ALLOWED_EMAIL is required when MAIL_MODE is smtp");
+if (SMTP_ENABLED && !ALLOWED_EMAIL) {
+    throw new Error("ALLOWED_EMAIL is required when SMTP_URL is set");
 }
 if (!fs.existsSync(CHALLENGE_IMAGE_PATH)) {
     throw new Error(`Challenge image missing: ${CHALLENGE_IMAGE_PATH}`);
 }
-const mailer = MAIL_MODE === "smtp" ? nodemailer.createTransport(SMTP_URL) : null;
-console.log(`Gatehouse mail mode: ${MAIL_MODE}`);
+const mailer = SMTP_ENABLED ? nodemailer.createTransport(SMTP_URL) : null;
+console.log(`Gatehouse mail: ${SMTP_ENABLED ? "smtp" : "stdout"}`);
 
 // --- helpers ---
 app.use((req, res, next) => {
@@ -101,7 +98,7 @@ function renderLoginStep(req, res, error = null, status = 200) {
 }
 
 async function sendCode(email, code) {
-    if (MAIL_MODE === "stdout") {
+    if (!SMTP_ENABLED) {
         console.log(`GATEHOUSE_EMAIL_CODE email=${email} code=${code}`);
         return;
     }

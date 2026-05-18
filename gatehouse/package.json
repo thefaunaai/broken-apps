@@ -1,7 +1,7 @@
 {
   "name": "gatehouse",
   "version": "1.0.0",
-  "description": "Gatehouse: auth checkpoint for sign-in. (Proof-case target for Hound.)",
+  "description": "Gatehouse: minimal auth checkpoint target.",
   "private": true,
   "main": "src/server.js",
   "scripts": {
