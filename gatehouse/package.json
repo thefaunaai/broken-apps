@@ -1,0 +1,21 @@
+{
+  "name": "gatehouse",
+  "version": "1.0.0",
+  "description": "Gatehouse: minimal auth checkpoint target.",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "node-puzzle": "^2.0.2",
+    "nodemailer": "^8.0.7",
+    "slider-captcha-js": "^1.0.8"
+  }
+}

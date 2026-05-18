@@ -1,0 +1,43 @@
+<%- include("_header", {
+    title: "Human verification",
+    extraHead: '<link rel="stylesheet" href="/vendor/slider-captcha.css" />'
+}) %>
+<section class="card auth">
+    <h1>Human verification</h1>
+    <p class="muted">Complete the puzzle to continue to the signed-in app.</p>
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+    <div id="captcha"></div>
+</section>
+<script src="/vendor/slider-captcha.umd.js"></script>
+<script>
+    const challenge = <%- JSON.stringify(challenge) %>;
+    new SliderCaptcha({
+        root: "#captcha",
+        width: 320,
+        height: 160,
+        theme: "light",
+        request: async () => ({ bgUrl: challenge.bgUrl, puzzleUrl: challenge.puzzleUrl }),
+        successText: "Verified",
+        failText: "Try again",
+        onVerify: async (data) => {
+            const res = await fetch("/login/challenge", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    challengeId: challenge.id,
+                    x: data.x,
+                    duration: data.duration,
+                    trail: data.trail,
+                }),
+            });
+            const result = await res.json().catch(() => ({ ok: false }));
+            if (!res.ok || !result.ok) throw new Error(result.error || "not verified");
+        },
+        onSuccess: () => {
+            window.location = "/app";
+        },
+    });
+</script>
+<%- include("_footer") %>

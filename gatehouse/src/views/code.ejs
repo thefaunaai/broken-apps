@@ -1,0 +1,13 @@
+<%- include("_header", { title: "Email verification" }) %>
+<section class="card auth">
+    <h1>Email verification</h1>
+    <p class="muted">Enter the code sent to <%= email %>.</p>
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+    <form method="post" action="/login/code">
+        <label>Security code<input name="code" inputmode="numeric" autocomplete="one-time-code" required autofocus /></label>
+        <button type="submit">Verify code</button>
+    </form>
+</section>
+<%- include("_footer") %>
