@@ -5,7 +5,7 @@ umask 077
 dnf install -y docker git
 systemctl start docker
 
-git clone --depth 1 --branch "${source_branch}" https://github.com/thefaunaai/broken-apps.git /opt/gatehouse
+git clone --depth 1 --branch "${source_branch}" https://github.com/thefaunaai/hound-in-action.git /opt/gatehouse
 cd /opt/gatehouse/gatehouse
 
 aws secretsmanager get-secret-value \

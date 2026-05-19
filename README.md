@@ -1,4 +1,4 @@
-# Broken Apps
+# Hound In Action
 
 Small applications built to make security testing claims concrete. Each
 app is narrow enough to audit, but realistic enough to exercise a real
