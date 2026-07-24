@@ -20,7 +20,9 @@ provider "aws" {
 }
 
 locals {
-  name = "gatehouse-target"
+  hosted_zone_name = trimsuffix(lower(trimspace(var.hosted_zone_name)), ".")
+  hostname         = trimsuffix(lower(trimspace(var.hostname)), ".")
+  name             = "gatehouse-target"
 }
 
 data "aws_vpc" "default" {
@@ -56,7 +58,7 @@ resource "aws_secretsmanager_secret_version" "smtp" {
 
 resource "aws_security_group" "gatehouse" {
   name        = local.name
-  description = "Gatehouse target app"
+  description = "Gatehouse EC2 target"
   vpc_id      = data.aws_vpc.default.id
 
   tags = {
@@ -64,13 +66,13 @@ resource "aws_security_group" "gatehouse" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allowed_http" {
-  security_group_id = aws_security_group.gatehouse.id
-  cidr_ipv4         = var.allowed_ingress_cidr
-  from_port         = 80
-  to_port           = 80
-  ip_protocol       = "tcp"
-  description       = "HTTP from allowed source IP"
+resource "aws_vpc_security_group_ingress_rule" "from_alb" {
+  security_group_id            = aws_security_group.gatehouse.id
+  referenced_security_group_id = aws_security_group.alb.id
+  from_port                    = 3000
+  to_port                      = 3000
+  ip_protocol                  = "tcp"
+  description                  = "Gatehouse traffic from the ALB"
 }
 
 resource "aws_vpc_security_group_egress_rule" "https" {
@@ -137,6 +139,7 @@ resource "aws_instance" "gatehouse" {
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.gatehouse.name
   vpc_security_group_ids      = [aws_security_group.gatehouse.id]
+  user_data_replace_on_change = true
 
   metadata_options {
     http_endpoint               = "enabled"
@@ -169,9 +172,20 @@ resource "aws_instance" "gatehouse" {
 }
 
 resource "terraform_data" "gatehouse_ready" {
-  triggers_replace = [aws_instance.gatehouse.id]
+  triggers_replace = [
+    aws_instance.gatehouse.id,
+    aws_lb_listener.https.arn,
+    aws_lb_listener.https.certificate_arn,
+    aws_route53_record.gatehouse.fqdn,
+  ]
 
   provisioner "local-exec" {
-    command = "bash ${path.module}/scripts/wait-ready.sh ${var.aws_region} ${aws_instance.gatehouse.id}"
+    command = "bash ${path.module}/scripts/wait-ready.sh ${var.aws_region} ${aws_instance.gatehouse.id} ${aws_lb_target_group.gatehouse.arn}"
   }
+
+  depends_on = [
+    aws_lb_target_group_attachment.gatehouse,
+    aws_vpc_security_group_egress_rule.alb_to_gatehouse,
+    aws_vpc_security_group_ingress_rule.from_alb,
+  ]
 }

@@ -34,11 +34,11 @@ docker run \
   --name gatehouse \
   --env-file .env \
   --env PORT=3000 \
-  --publish 80:3000 \
+  --publish 3000:3000 \
   gatehouse
 
 for i in $(seq 1 30); do
-  if curl -fsS http://127.0.0.1/health >/dev/null; then
+  if curl -fsS http://127.0.0.1:3000/health >/dev/null; then
     touch /opt/gatehouse-ready
     exit 0
   fi

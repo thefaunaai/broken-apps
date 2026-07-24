@@ -1,3 +1,6 @@
+hosted_zone_name = "example.com"
+hostname         = "gatehouse.example.com"
+
 allowed_ingress_cidr = "203.0.113.10/32"
 allowed_email        = "recipient@example.com"
 

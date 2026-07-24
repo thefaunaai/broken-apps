@@ -66,9 +66,10 @@ mode.
 
 ## EC2 Run
 
-Use `infra/` when the run needs a public URL instead of a local Docker
-port. The stack creates one disposable EC2 instance, serves HTTP only to
-one allowed source IP, uses SSM instead of SSH, and manages SMTP config
-in Secrets Manager from local Terraform settings.
+Use `infra/` for a temporary cloud run. Terraform deploys Gatehouse on a
+disposable EC2 instance behind an HTTPS Application Load Balancer. The
+load balancer accepts traffic only from the configured source CIDR, EC2
+access uses SSM instead of SSH, and SMTP configuration is stored in
+Secrets Manager.
 
 Terraform state is local, gitignored, and disposable.

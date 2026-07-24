@@ -23,9 +23,10 @@ These apps are test targets, not production services. Run them locally
 by default. Do not expose them to the public internet without an
 explicit network allowlist.
 
-Gatehouse includes a disposable EC2 stack for temporary cloud runs. That
-stack restricts HTTP ingress to one allowed source IP. Do not run these
-apps as unrestricted public services.
+Gatehouse includes a disposable AWS deployment for temporary cloud
+runs. It places the EC2 instance behind an HTTPS Application Load
+Balancer and accepts traffic only from the configured source CIDR. Do
+not run these apps as unrestricted public services.
 
 ## License
 

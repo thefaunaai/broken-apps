@@ -4,6 +4,26 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "hosted_zone_name" {
+  description = "Public Route 53 hosted zone used for Gatehouse DNS and certificate validation."
+  type        = string
+
+  validation {
+    condition     = can(regex("^([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\\.?$", trimspace(var.hosted_zone_name)))
+    error_message = "hosted_zone_name must be a valid DNS name such as example.com."
+  }
+}
+
+variable "hostname" {
+  description = "Full public hostname for Gatehouse."
+  type        = string
+
+  validation {
+    condition     = can(regex("^([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\\.?$", trimspace(var.hostname)))
+    error_message = "hostname must be a valid DNS name such as gatehouse.example.com."
+  }
+}
+
 variable "source_branch" {
   description = "Git branch to clone for the Gatehouse source."
   type        = string
@@ -16,7 +36,7 @@ variable "source_branch" {
 }
 
 variable "allowed_ingress_cidr" {
-  description = "Only this IP can reach Gatehouse over HTTP. Use one IPv4 address as x.x.x.x/32."
+  description = "Only this IP can reach Gatehouse over HTTPS. Use one IPv4 address as x.x.x.x/32."
   type        = string
 
   validation {
